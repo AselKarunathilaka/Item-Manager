@@ -434,3 +434,8 @@ or clear site data for `localhost`.
 ## Current Status
 
 The app is ready for manual local testing. Jenkins CI/CD can be configured later when you are ready to practice pipeline execution.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
