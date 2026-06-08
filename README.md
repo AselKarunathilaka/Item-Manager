@@ -147,7 +147,7 @@ The backend loads this root `.env` file from `backend/src/index.js`.
 From the project root:
 
 ```powershell
-cd "C:\Users\faith\Documents\My DevOps\Item-Manager"
+cd "C:\Users\MyPc\Documents\Item-Manager"
 npm install
 ```
 
@@ -163,7 +163,7 @@ Use two terminals so it is easy to see backend and frontend output separately.
 Terminal 1: start the backend:
 
 ```powershell
-cd "C:\Users\faith\Documents\My DevOps\Item-Manager"
+cd "C:\Users\MyPc\Documents\Item-Manager"
 npm run dev --workspace backend
 ```
 
@@ -176,7 +176,7 @@ API listening on port 5000
 Terminal 2: start the frontend:
 
 ```powershell
-cd "C:\Users\faith\Documents\My DevOps\Item-Manager"
+cd "C:\Users\MyPc\Documents\Item-Manager"
 npm run dev --workspace frontend
 ```
 
