@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Item Manager</title>
+  <rect width="64" height="64" rx="10" fill="#e2a13a"/>
+  <path d="M14 22 32 13l18 9-18 9-18-9Z" fill="#fffaf0" stroke="#2b211e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m14 22 18 9 18-9v20L32 51 14 42V22Z" fill="#fffaf0" stroke="#2b211e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M32 31v20M23 17.5l18 9" fill="none" stroke="#2b211e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M39 37h13a4 4 0 0 1 4 4v7a4 4 0 0 1-4 4H39a4 4 0 0 1-4-4v-7a4 4 0 0 1 4-4Z" fill="#246b68" stroke="#2b211e" stroke-width="3"/>
+  <circle cx="40.5" cy="41.5" r="1.8" fill="#fffaf0"/>
+</svg>
