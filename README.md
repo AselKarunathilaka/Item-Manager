@@ -21,11 +21,12 @@ The home page shows inventory statistics, item cards, search, category filters, 
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | React 19, Vite |
+| Frontend | React 19, Vite, Tailwind CSS 4 |
 | Backend | Node.js, Express |
 | Database | MongoDB Atlas |
 | ODM | Mongoose |
 | Testing | Vitest, Testing Library, Supertest |
+| Typography | Google Fonts: Fraunces and Manrope |
 | Linting | ESLint |
 | CI/CD learning | Jenkins declarative pipeline |
 
@@ -438,4 +439,5 @@ The app is ready for manual local testing. Jenkins CI/CD can be configured later
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
 
