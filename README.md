@@ -1,4 +1,4 @@
-﻿# MERN Item Manager
+# MERN Item Manager
 
 A simple but complete inventory management app built with the MERN stack. The app is intentionally small enough for Jenkins CI/CD practice, but it still has real frontend and backend behavior: item creation, editing, deletion, search, filtering, sorting, validation, MongoDB persistence, and automated tests.
 
@@ -17,6 +17,8 @@ Item Manager lets you maintain a small inventory collection. Each item can store
 
 The home page shows inventory statistics, item cards, search, category filters, and sorting controls. The add/edit page provides a form with validation and a live item preview.
 
+**UI Features:** A premium, modern dark mode with glassmorphism (frosted glass panels), neon glowing accents, smooth micro-animations, and dynamic hover effects.
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -26,7 +28,7 @@ The home page shows inventory statistics, item cards, search, category filters, 
 | Database | MongoDB Atlas |
 | ODM | Mongoose |
 | Testing | Vitest, Testing Library, Supertest |
-| Typography | Google Fonts: Fraunces and Manrope |
+| Typography | Google Fonts: Inter and Outfit |
 | Linting | ESLint |
 | CI/CD learning | Jenkins declarative pipeline |
 
