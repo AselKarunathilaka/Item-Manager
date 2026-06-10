@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { itemApi } from './api';
 
 const emptyItem = {
@@ -11,14 +11,14 @@ const emptyItem = {
 };
 
 const buttonBase =
-  'inline-flex min-h-11 items-center justify-center rounded-md border px-4 py-2.5 text-sm font-extrabold transition duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#246b68]/20 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]';
-const primaryButton = `${buttonBase} border-[#8f3e2a] bg-[#8f3e2a] text-white shadow-sm hover:-translate-y-0.5 hover:border-[#6f2c1d] hover:bg-[#6f2c1d] hover:shadow-md`;
-const secondaryButton = `${buttonBase} border-[#cabba9] bg-white text-[#241b18] hover:-translate-y-0.5 hover:border-[#246b68] hover:text-[#246b68]`;
-const dangerButton = `${buttonBase} border-[#e2bcbc] bg-white text-[#a63737] hover:-translate-y-0.5 hover:border-[#a63737] hover:bg-[#a63737] hover:text-white`;
+  'inline-flex min-h-11 items-center justify-center rounded-xl border px-5 py-2.5 text-sm font-bold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090b] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]';
+const primaryButton = `${buttonBase} border-transparent bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)]`;
+const secondaryButton = `${buttonBase} border-white/10 bg-white/5 text-slate-200 backdrop-blur-md hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 hover:text-white`;
+const dangerButton = `${buttonBase} border-transparent bg-rose-500/10 text-rose-400 hover:-translate-y-0.5 hover:bg-rose-500/20 hover:text-rose-300`;
 const fieldClass =
-  'h-12 w-full min-w-0 rounded-md border border-[#cdbb9f] bg-[#fffdf8] px-3.5 text-sm text-[#241b18] outline-none transition duration-200 placeholder:text-[#8d817b] hover:border-[#a99070] focus:border-[#246b68] focus:ring-4 focus:ring-[#246b68]/15 aria-[invalid=true]:border-[#a63737] aria-[invalid=true]:focus:ring-[#a63737]/15';
-const labelClass = 'block min-w-0 text-xs font-extrabold text-[#51433d]';
-const eyebrowClass = 'mb-2.5 text-[0.7rem] font-extrabold uppercase text-[#246b68]';
+  'h-12 w-full min-w-0 rounded-xl border border-white/10 bg-black/40 px-4 text-sm text-slate-100 outline-none backdrop-blur-md transition-all duration-300 placeholder:text-slate-500 hover:border-white/20 hover:bg-black/60 focus:border-indigo-500 focus:bg-black/60 focus:ring-4 focus:ring-indigo-500/20 aria-[invalid=true]:border-rose-500 aria-[invalid=true]:focus:ring-rose-500/20';
+const labelClass = 'block min-w-0 text-xs font-semibold uppercase tracking-wider text-slate-400';
+const eyebrowClass = 'mb-3 text-[0.75rem] font-bold uppercase tracking-widest text-indigo-400';
 
 function useRoute() {
   const [path, setPath] = useState(window.location.pathname);
@@ -40,33 +40,35 @@ function useRoute() {
 
 function Header({ path, navigate }) {
   const navClass = (active) =>
-    `relative min-w-20 border-0 bg-transparent px-4 text-sm font-extrabold transition duration-200 after:absolute after:inset-x-4 after:bottom-[18px] after:h-0.5 after:origin-left after:bg-[#e2a13a] after:transition-transform after:duration-200 ${
+    `relative min-w-20 border-0 bg-transparent px-4 text-sm font-bold transition duration-300 after:absolute after:inset-x-4 after:-bottom-[23px] after:h-[3px] after:origin-left after:rounded-t-md after:bg-indigo-400 after:transition-transform after:duration-300 ${
       active
-        ? 'text-[#ffd473] after:scale-x-100'
-        : 'text-white after:scale-x-0 hover:text-[#ffd473] hover:after:scale-x-100'
+        ? 'text-indigo-400 after:scale-x-100'
+        : 'text-slate-300 after:scale-x-0 hover:text-indigo-300 hover:after:scale-x-100'
     }`;
 
   return (
-    <header className="animate-fade-in flex min-h-[82px] items-stretch justify-between gap-6 border-b-4 border-[#e2a13a] bg-[#843724] px-4 text-[#fffaf0] shadow-[0_8px_20px_rgba(59,25,17,0.18)] sm:px-6 xl:px-[max(24px,calc((100vw-1360px)/2))]">
+    <header className="animate-fade-in sticky top-0 z-50 flex min-h-[72px] items-stretch justify-between gap-6 border-b border-white/10 bg-[#09090b]/80 backdrop-blur-lg px-4 shadow-sm sm:px-6 xl:px-[max(24px,calc((100vw-1360px)/2))]">
       <button
         className="group flex items-center gap-3 border-0 bg-transparent p-0 text-left text-inherit"
         type="button"
         onClick={() => navigate('/')}
       >
-        <span className="h-10 w-10 flex-none overflow-hidden rounded-md border border-white/45 transition duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:h-[42px] sm:w-[42px]">
-          <img className="block h-full w-full" src="/item-manager.svg" alt="" />
+        <span className="flex h-10 w-10 flex-none items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg transition duration-500 group-hover:rotate-12 group-hover:scale-110 sm:h-[42px] sm:w-[42px]">
+          <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
         </span>
         <span>
-          <strong className="block text-sm font-extrabold sm:text-base">Item Manager</strong>
-          <small className="mt-0.5 hidden text-[0.72rem] font-medium text-[#f1d8c9] sm:block">
-            Inventory workspace
+          <strong className="block font-display text-lg font-bold text-slate-100 sm:text-xl">Inventory</strong>
+          <small className="hidden text-[0.75rem] font-medium text-slate-400 sm:block">
+            Management System
           </small>
         </span>
       </button>
 
-      <nav className="flex items-stretch" aria-label="Main navigation">
+      <nav className="flex items-stretch pt-2" aria-label="Main navigation">
         <button className={navClass(path === '/')} type="button" onClick={() => navigate('/')}>
-          Home
+          Dashboard
         </button>
         <button
           className={navClass(path === '/add-item')}
@@ -82,7 +84,7 @@ function Header({ path, navigate }) {
 
 function ItemImage({ item, large = false }) {
   const [failed, setFailed] = useState(false);
-  const sizeClass = large ? 'mb-6 rounded-md border border-[#d7c3a5]' : '';
+  const sizeClass = large ? 'mb-6 rounded-xl border border-white/10 shadow-lg' : '';
 
   useEffect(() => {
     setFailed(false);
@@ -91,20 +93,20 @@ function ItemImage({ item, large = false }) {
   if (!item.imageUrl || failed) {
     return (
       <div
-        className={`grid aspect-[16/10] w-full place-content-center gap-2 bg-[linear-gradient(135deg,rgba(36,107,104,0.16),rgba(226,161,58,0.25))] text-center text-[#6a5d56] ${sizeClass}`}
+        className={`grid aspect-[16/10] w-full place-content-center gap-2 bg-gradient-to-br from-slate-800 to-slate-900 text-center text-slate-500 ${sizeClass}`}
         aria-label="No item image available"
       >
-        <span className="font-display text-4xl font-extrabold">
+        <span className="font-display text-4xl font-bold">
           {item.name?.slice(0, 2).toUpperCase() || 'IM'}
         </span>
-        <small className="text-[0.68rem] font-extrabold uppercase">No image available</small>
+        <small className="text-[0.7rem] font-bold uppercase tracking-wider">No image</small>
       </div>
     );
   }
 
   return (
     <img
-      className={`block aspect-[16/10] w-full bg-[#e8dfd1] object-cover transition duration-500 ease-out group-hover:scale-[1.025] ${sizeClass}`}
+      className={`block aspect-[16/10] w-full bg-slate-900 object-cover transition-transform duration-700 ease-out group-hover:scale-110 ${sizeClass}`}
       src={item.imageUrl}
       alt={item.name}
       onError={() => setFailed(true)}
@@ -114,10 +116,10 @@ function ItemImage({ item, large = false }) {
 
 function Warranty({ terms }) {
   return (
-    <div className="grid gap-1 border-l-[3px] border-[#e2a13a] bg-[#f5ecdd] px-3.5 py-3">
-      <span className="text-[0.65rem] font-extrabold uppercase text-[#6f625d]">Warranty</span>
-      <strong className="text-xs font-bold leading-5 text-[#241b18]">
-        {terms || 'No warranty information'}
+    <div className="grid gap-1 rounded-r-lg border-l-4 border-indigo-500 bg-indigo-500/10 px-4 py-3">
+      <span className="text-[0.65rem] font-bold uppercase tracking-wider text-indigo-300">Warranty</span>
+      <strong className="text-xs font-medium leading-5 text-slate-300">
+        {terms || 'No warranty information provided'}
       </strong>
     </div>
   );
@@ -126,36 +128,37 @@ function Warranty({ terms }) {
 function ItemCard({ item, index, onEdit, onDelete, deleting }) {
   return (
     <article
-      className="stagger-card group min-w-0 overflow-hidden rounded-lg border border-[#e8cfaa] bg-[#fffaf0] shadow-[0_12px_30px_rgba(70,47,31,0.09)] transition duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_42px_rgba(70,47,31,0.16)]"
+      className="stagger-card group min-w-0 overflow-hidden rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md shadow-xl transition-all duration-500 ease-out hover:-translate-y-2 hover:border-indigo-500/30 hover:bg-white/[0.07] hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.3)]"
       style={{ '--delay': `${Math.min(index, 8) * 65}ms` }}
     >
-      <div className="overflow-hidden">
+      <div className="overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <ItemImage item={item} />
       </div>
-      <div className="p-5 sm:p-[22px]">
+      <div className="p-6">
         <div className="flex items-start justify-between gap-4 max-[460px]:flex-col">
           <div className="min-w-0">
-            <span className="inline-block max-w-full text-[0.68rem] font-extrabold uppercase text-[#246b68] [overflow-wrap:anywhere]">
+            <span className="inline-block max-w-full rounded-full bg-indigo-500/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-indigo-300 [overflow-wrap:anywhere]">
               {item.category}
             </span>
-            <h3 className="mt-2 font-display text-[1.35rem] font-bold leading-tight text-[#241b18] [overflow-wrap:anywhere]">
+            <h3 className="mt-3 font-display text-[1.4rem] font-bold leading-tight text-slate-100 [overflow-wrap:anywhere]">
               {item.name}
             </h3>
           </div>
-          <strong className="whitespace-nowrap font-extrabold text-[#8f3e2a]">
+          <strong className="whitespace-nowrap rounded-lg bg-emerald-500/10 px-3 py-1.5 font-mono text-lg font-bold text-emerald-400">
             ${Number(item.price).toFixed(2)}
           </strong>
         </div>
 
-        <p className="my-[18px] line-clamp-3 min-h-[66px] text-sm leading-6 text-[#6f625d]">
+        <p className="my-[20px] line-clamp-3 min-h-[66px] text-sm leading-relaxed text-slate-400">
           {item.description}
         </p>
 
         <Warranty terms={item.warrantyTerms} />
 
-        <div className="mt-5 flex gap-2.5">
+        <div className="mt-6 flex gap-3">
           <button className={`${secondaryButton} flex-1`} type="button" onClick={() => onEdit(item._id)}>
-            Edit
+            Edit Details
           </button>
           <button
             className={`${dangerButton} flex-1`}
@@ -163,7 +166,7 @@ function ItemCard({ item, index, onEdit, onDelete, deleting }) {
             disabled={deleting}
             onClick={() => onDelete(item)}
           >
-            {deleting ? 'Removing...' : 'Delete'}
+            {deleting ? 'Removing...' : 'Remove'}
           </button>
         </div>
       </div>
@@ -174,11 +177,12 @@ function ItemCard({ item, index, onEdit, onDelete, deleting }) {
 function Stat({ label, value, delay }) {
   return (
     <div
-      className="stagger-card flex min-h-24 items-center justify-between gap-4 border-b-[3px] border-[#246b68] bg-white/80 px-6 py-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+      className="stagger-card relative overflow-hidden flex min-h-[110px] items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/5 px-7 py-6 backdrop-blur-md shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-white/10 hover:bg-white/10"
       style={{ '--delay': delay }}
     >
-      <span className="text-sm font-bold text-[#6f625d]">{label}</span>
-      <strong className="font-display text-[1.8rem] font-bold text-[#241b18]">{value}</strong>
+      <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-indigo-500/10 blur-2xl" />
+      <span className="text-sm font-semibold tracking-wide text-slate-400">{label}</span>
+      <strong className="font-display text-[2rem] font-bold text-slate-100">{value}</strong>
     </div>
   );
 }
@@ -186,7 +190,7 @@ function Stat({ label, value, delay }) {
 function StatePanel({ children, className = '' }) {
   return (
     <div
-      className={`animate-soft-in grid min-h-[290px] place-items-center content-center border border-dashed border-[#cdbb9f] bg-[#fffaf0]/70 p-10 text-center ${className}`}
+      className={`animate-soft-in grid min-h-[300px] place-items-center content-center rounded-3xl border border-dashed border-white/20 bg-black/20 p-10 text-center backdrop-blur-sm ${className}`}
     >
       {children}
     </div>
@@ -263,39 +267,42 @@ function HomePage({ navigate }) {
 
   return (
     <main className="mx-auto w-[min(calc(100%-20px),1360px)] sm:w-[min(calc(100%-32px),1360px)]">
-      <section className="animate-rise mt-6 flex min-h-0 flex-col items-start justify-between gap-8 rounded-lg border border-[#e8cfaa] border-l-[6px] border-l-[#8f3e2a] bg-[#fffaf0] p-6 shadow-[0_18px_45px_rgba(85,55,35,0.12)] sm:mt-12 sm:p-10 lg:min-h-[230px] lg:flex-row lg:items-center lg:p-16">
-        <div>
-          <p className={eyebrowClass}>Inventory overview</p>
-          <h1 className="mb-3.5 font-display text-5xl font-bold leading-[0.95] text-[#241b18] sm:text-6xl lg:text-[4.5rem]">
-            Item Details
+      <section className="animate-rise relative mt-6 flex min-h-0 flex-col items-start justify-between gap-8 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl sm:mt-12 sm:p-12 lg:min-h-[250px] lg:flex-row lg:items-center lg:p-16">
+        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-indigo-600/20 blur-[80px]" />
+        <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-purple-600/20 blur-[100px]" />
+        
+        <div className="relative z-10">
+          <p className={eyebrowClass}>Dashboard Overview</p>
+          <h1 className="mb-4 font-display text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-white to-slate-400 sm:text-6xl lg:text-[4.5rem]">
+            Inventory Space
           </h1>
-          <p className="max-w-[720px] text-base leading-7 text-[#6f625d] sm:text-[1.08rem]">
-            View, organize, edit, and remove items from one focused workspace.
+          <p className="max-w-[720px] text-base leading-relaxed text-slate-400 sm:text-lg">
+            Manage your items with a beautiful, fast, and modern interface. View, organize, and edit your collection effortlessly.
           </p>
         </div>
-        <button className={`${primaryButton} w-full lg:w-auto lg:min-w-[150px]`} type="button" onClick={() => navigate('/add-item')}>
+        <button className={`${primaryButton} relative z-10 w-full lg:w-auto lg:min-w-[160px]`} type="button" onClick={() => navigate('/add-item')}>
           Add new item
         </button>
       </section>
 
-      <section className="my-5 grid grid-cols-1 gap-4 sm:mb-12 lg:grid-cols-3" aria-label="Inventory summary">
+      <section className="my-8 grid grid-cols-1 gap-5 sm:mb-14 lg:grid-cols-3" aria-label="Inventory summary">
         <Stat label="Total items" value={items.length} delay="100ms" />
         <Stat label="Categories" value={categories.length} delay="165ms" />
         <Stat label="Combined value" value={`$${totalValue.toFixed(2)}`} delay="230ms" />
       </section>
 
       <section className="mb-[72px]" aria-labelledby="inventory-title">
-        <div className="mb-[18px] flex items-end justify-between gap-6">
+        <div className="mb-[20px] flex items-end justify-between gap-6">
           <div>
             <p className={eyebrowClass}>Your collection</p>
-            <h2 id="inventory-title" className="font-display text-4xl font-bold text-[#241b18]">
+            <h2 id="inventory-title" className="font-display text-4xl font-bold tracking-tight text-slate-100">
               Inventory
             </h2>
           </div>
-          <span className="text-xs font-bold text-[#6f625d] sm:text-sm">{visibleItems.length} shown</span>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-300 sm:text-sm">{visibleItems.length} shown</span>
         </div>
 
-        <div className="mb-6 grid grid-cols-1 gap-3.5 border border-[#e4d6c5] bg-white/75 p-[18px] shadow-sm lg:grid-cols-[minmax(240px,1fr)_220px_220px]">
+        <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 backdrop-blur-md lg:grid-cols-[minmax(240px,1fr)_220px_220px]">
           <label className={labelClass}>
             <span className="mb-2 block">Search items</span>
             <input
@@ -327,9 +334,9 @@ function HomePage({ navigate }) {
         </div>
 
         {error && (
-          <div className="animate-soft-in mb-5 flex items-center justify-between gap-4 rounded-md border border-[#e1b1b1] bg-[#fff1f1] px-4 py-3 text-sm font-bold text-[#7f2424]" role="alert">
+          <div className="animate-soft-in mb-6 flex items-center justify-between gap-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm font-bold text-rose-400" role="alert">
             <span>{error}</span>
-            <button className="font-extrabold underline" type="button" onClick={loadItems}>
+            <button className="font-extrabold underline hover:text-rose-300" type="button" onClick={loadItems}>
               Try again
             </button>
           </div>
@@ -337,17 +344,21 @@ function HomePage({ navigate }) {
 
         {loading ? (
           <StatePanel>
-            <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#dbc9ae] border-t-[#8f3e2a]" />
-            <h3 className="mt-[18px] mb-2 font-display text-xl font-bold">Loading your inventory</h3>
-            <p className="max-w-lg text-sm text-[#6f625d]">Fetching the latest items from the database.</p>
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.5)]" />
+            <h3 className="mt-[20px] mb-2 font-display text-xl font-bold text-slate-200">Loading your inventory</h3>
+            <p className="max-w-lg text-sm text-slate-400">Fetching the latest items from the database.</p>
           </StatePanel>
         ) : visibleItems.length === 0 ? (
           <StatePanel>
-            <span className="grid h-[42px] w-[42px] place-items-center rounded-md bg-[#246b68] font-extrabold text-white">IM</span>
-            <h3 className="mt-[18px] mb-2 font-display text-xl font-bold">
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-indigo-500/20 font-extrabold text-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+            </span>
+            <h3 className="mt-[20px] mb-2 font-display text-xl font-bold text-slate-200">
               {items.length === 0 ? 'Your inventory is empty' : 'No matching items'}
             </h3>
-            <p className="mb-5 max-w-lg text-sm leading-6 text-[#6f625d]">
+            <p className="mb-6 max-w-lg text-sm leading-6 text-slate-400">
               {items.length === 0
                 ? 'Add your first item to start building the collection.'
                 : 'Try changing the search text or category filter.'}
@@ -378,7 +389,7 @@ function HomePage({ navigate }) {
 }
 
 function FieldError({ children }) {
-  return children ? <small className="mt-1.5 block text-xs font-bold text-[#a63737]">{children}</small> : null;
+  return children ? <small className="mt-1.5 block text-xs font-bold text-rose-400">{children}</small> : null;
 }
 
 function ItemFormPage({ itemId, navigate }) {
@@ -452,8 +463,8 @@ function ItemFormPage({ itemId, navigate }) {
     return (
       <main className="mx-auto flex-1 w-[min(calc(100%-20px),1360px)] sm:w-[min(calc(100%-32px),1360px)]">
         <StatePanel className="my-12">
-          <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#dbc9ae] border-t-[#8f3e2a]" />
-          <h2 className="mt-[18px] font-display text-2xl font-bold">Loading item</h2>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.5)]" />
+          <h2 className="mt-[20px] font-display text-2xl font-bold text-slate-200">Loading item</h2>
         </StatePanel>
       </main>
     );
@@ -461,35 +472,35 @@ function ItemFormPage({ itemId, navigate }) {
 
   return (
     <main className="mx-auto flex-1 w-[min(calc(100%-20px),1360px)] sm:w-[min(calc(100%-32px),1360px)]">
-      <section className="animate-rise my-6 overflow-hidden rounded-lg border border-[#e8cfaa] bg-[#fffaf0] shadow-[0_18px_45px_rgba(85,55,35,0.12)] sm:my-12 sm:mb-[72px]">
-        <div className="border-b border-[#ead8bd] p-6 sm:p-10 lg:p-[52px]">
+      <section className="animate-rise my-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl sm:my-12 sm:mb-[72px]">
+        <div className="border-b border-white/10 p-8 sm:p-12 lg:p-[60px]">
           <button
-            className="mb-6 border-0 bg-transparent p-0 text-sm font-extrabold text-[#8f3e2a] transition hover:-translate-x-1 hover:text-[#6f2c1d] hover:underline"
+            className="mb-8 inline-flex items-center gap-2 border-0 bg-transparent p-0 text-sm font-bold text-indigo-400 transition-all hover:-translate-x-2 hover:text-indigo-300"
             type="button"
             onClick={() => navigate('/')}
           >
-            Back to inventory
+            &larr; Back to dashboard
           </button>
-          <p className={eyebrowClass}>{editing ? 'Update inventory' : 'New inventory record'}</p>
-          <h1 className="mb-3 font-display text-4xl font-bold leading-none text-[#241b18] sm:text-5xl lg:text-[3.5rem]">
-            {editing ? 'Edit Item' : 'Add Item'}
+          <p className={eyebrowClass}>{editing ? 'Update Record' : 'New Record'}</p>
+          <h1 className="mb-4 font-display text-4xl font-extrabold tracking-tight text-slate-100 sm:text-5xl lg:text-[3.5rem]">
+            {editing ? 'Edit Item' : 'Create Item'}
           </h1>
-          <p className="max-w-[720px] text-base leading-7 text-[#6f625d]">
+          <p className="max-w-[720px] text-base leading-relaxed text-slate-400">
             {editing
-              ? 'Update the details below and save your changes.'
-              : 'Add clear details so this item is easy to identify and manage.'}
+              ? 'Update the item details below and save your changes.'
+              : 'Add comprehensive details to accurately catalog your new item.'}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <form className="p-6 sm:p-10 lg:p-[52px]" onSubmit={submit} noValidate>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <form className="p-8 sm:p-12 lg:p-[60px]" onSubmit={submit} noValidate>
             {error && (
-              <div className="animate-soft-in mb-5 rounded-md border border-[#e1b1b1] bg-[#fff1f1] px-4 py-3 text-sm font-bold text-[#7f2424]" role="alert">
+              <div className="animate-soft-in mb-6 rounded-xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm font-bold text-rose-400" role="alert">
                 {error}
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-x-[18px] gap-y-[22px] sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-[20px] gap-y-[24px] sm:grid-cols-2">
               <label className={`${labelClass} sm:col-span-2`}>
                 <span className="mb-2 block">Item name</span>
                 <input
@@ -537,7 +548,7 @@ function ItemFormPage({ itemId, navigate }) {
               <label className={`${labelClass} sm:col-span-2`}>
                 <span className="mb-2 block">Description</span>
                 <textarea
-                  className={`${fieldClass} h-auto min-h-36 resize-y py-3 leading-6`}
+                  className={`${fieldClass} h-auto min-h-[160px] resize-y py-4 leading-relaxed`}
                   name="description"
                   value={form.description}
                   onChange={updateField}
@@ -546,7 +557,7 @@ function ItemFormPage({ itemId, navigate }) {
                   placeholder="Describe the item, its condition, and important features"
                   aria-invalid={Boolean(fieldErrors.description)}
                 />
-                <small className="mt-1.5 block text-right text-xs font-medium text-[#6f625d]">
+                <small className="mt-2 block text-right text-xs font-medium text-slate-500">
                   {form.description.length}/1000 characters
                 </small>
                 <FieldError>{fieldErrors.description}</FieldError>
@@ -581,7 +592,7 @@ function ItemFormPage({ itemId, navigate }) {
               </label>
             </div>
 
-            <div className="mt-[30px] flex flex-col-reverse justify-end gap-3 border-t border-[#ead8bd] pt-6 sm:flex-row">
+            <div className="mt-[36px] flex flex-col-reverse justify-end gap-4 border-t border-white/10 pt-8 sm:flex-row">
               <button className={secondaryButton} type="button" onClick={() => navigate('/')}>
                 Cancel
               </button>
@@ -591,21 +602,21 @@ function ItemFormPage({ itemId, navigate }) {
             </div>
           </form>
 
-          <aside className="group min-w-0 border-t border-[#ead8bd] bg-[#f2e8d7] p-7 lg:border-t-0 lg:border-l">
-            <p className={eyebrowClass}>Live preview</p>
-            <div className="overflow-hidden rounded-md">
+          <aside className="group min-w-0 border-t border-white/10 bg-black/20 p-8 backdrop-blur-md lg:border-t-0 lg:border-l">
+            <p className={eyebrowClass}>Live Preview</p>
+            <div className="overflow-hidden rounded-xl">
               <ItemImage item={form} large />
             </div>
-            <span className="inline-block max-w-full text-[0.68rem] font-extrabold uppercase text-[#246b68] [overflow-wrap:anywhere]">
+            <span className="inline-block max-w-full rounded-full bg-indigo-500/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-indigo-300 [overflow-wrap:anywhere] mt-4">
               {form.category || 'Category'}
             </span>
-            <h2 className="mt-2 mb-1.5 font-display text-2xl font-bold [overflow-wrap:anywhere]">
+            <h2 className="mt-3 mb-2 font-display text-2xl font-bold text-slate-100 [overflow-wrap:anywhere]">
               {form.name || 'Your item name'}
             </h2>
-            <strong className="mb-5 block text-xl font-extrabold text-[#8f3e2a]">
+            <strong className="mb-6 block text-xl font-mono font-bold text-emerald-400">
               {form.price === '' ? '$0.00' : `$${Number(form.price || 0).toFixed(2)}`}
             </strong>
-            <p className="mb-5 text-sm leading-6 text-[#6f625d] [overflow-wrap:anywhere]">
+            <p className="mb-6 text-sm leading-relaxed text-slate-400 [overflow-wrap:anywhere]">
               {form.description || 'Your item description will appear here.'}
             </p>
             <Warranty terms={form.warrantyTerms} />
@@ -630,13 +641,21 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,rgba(226,161,58,0.10),transparent_330px)] text-[#241b18]">
-      <Header path={path} navigate={navigate} />
-      {page}
-      <footer className="mt-auto flex min-h-[76px] flex-col items-start justify-center gap-1 bg-[#2b211e] px-5 py-5 text-xs text-[#d8cac1] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 xl:px-[max(24px,calc((100vw-1360px)/2))]">
-        <span className="font-extrabold text-white">Item Manager</span>
-        <span>Simple inventory, clearly organized.</span>
-      </footer>
+    <div className="flex min-h-screen flex-col bg-[#09090b] text-slate-300 antialiased selection:bg-indigo-500/30 selection:text-white relative overflow-hidden">
+      {/* Background ambient lighting */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 h-[600px] w-[600px] rounded-full bg-purple-900/10 blur-[150px]" />
+      </div>
+      
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <Header path={path} navigate={navigate} />
+        {page}
+        <footer className="mt-auto flex min-h-[80px] flex-col items-center justify-center gap-2 border-t border-white/10 bg-[#09090b]/80 backdrop-blur-md px-5 py-6 text-sm text-slate-500 sm:flex-row sm:justify-between sm:px-6 xl:px-[max(24px,calc((100vw-1360px)/2))]">
+          <span className="font-bold text-slate-300 tracking-wide">Item Manager &copy; {new Date().getFullYear()}</span>
+          <span>Engineered for excellence.</span>
+        </footer>
+      </div>
     </div>
   );
 }
