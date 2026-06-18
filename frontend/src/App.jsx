@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { itemApi } from './api';
 import { currencyOptions, DEFAULT_CURRENCY, formatMoney, normalizeCurrency } from './currencies';
 
+const draftStorageKey = 'item-manager:item-draft';
+const duplicateStorageKey = 'item-manager:duplicate-item';
+
 const emptyItem = {
   name: '',
   category: '',
@@ -21,6 +24,78 @@ const fieldClass =
   'h-12 w-full min-w-0 rounded-xl border border-white/10 bg-black/40 px-4 text-sm text-slate-100 outline-none backdrop-blur-md transition-all duration-300 placeholder:text-slate-500 hover:border-white/20 hover:bg-black/60 focus:border-indigo-500 focus:bg-black/60 focus:ring-4 focus:ring-indigo-500/20 aria-[invalid=true]:border-rose-500 aria-[invalid=true]:focus:ring-rose-500/20';
 const labelClass = 'block min-w-0 text-xs font-semibold uppercase tracking-wider text-slate-400';
 const eyebrowClass = 'mb-3 text-[0.75rem] font-bold uppercase tracking-widest text-indigo-400';
+
+function formatTimestamp(value) {
+  if (!value) return 'Recently added';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Recently added';
+
+  return new Intl.DateTimeFormat('en-LK', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+}
+
+function buildCsvValue(value) {
+  const normalized = String(value ?? '').replace(/"/g, '""');
+  return `"${normalized}"`;
+}
+
+function exportItemsToCsv(items) {
+  const headers = [
+    'Name',
+    'Category',
+    'Price',
+    'Currency',
+    'Description',
+    'Image URL',
+    'Warranty Terms',
+    'Created At',
+    'Updated At'
+  ];
+
+  const rows = items.map((item) =>
+    [
+      item.name,
+      item.category,
+      item.price,
+      normalizeCurrency(item.currency),
+      item.description,
+      item.imageUrl || '',
+      item.warrantyTerms || '',
+      item.createdAt || '',
+      item.updatedAt || ''
+    ]
+      .map(buildCsvValue)
+      .join(',')
+  );
+
+  const csv = [headers.map(buildCsvValue).join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `inventory-export-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function isBlankDraft(form) {
+  return (
+    !form.name.trim() &&
+    !form.category.trim() &&
+    (form.price === '' || form.price === null) &&
+    normalizeCurrency(form.currency) === DEFAULT_CURRENCY &&
+    !form.description.trim() &&
+    !form.imageUrl.trim() &&
+    !form.warrantyTerms.trim()
+  );
+}
 
 function useRoute() {
   const [path, setPath] = useState(window.location.pathname);
@@ -127,7 +202,7 @@ function Warranty({ terms }) {
   );
 }
 
-function ItemCard({ item, index, onEdit, onDelete, deleting }) {
+function ItemCard({ item, index, onDuplicate, onEdit, onDelete, deleting }) {
   return (
     <article
       className="stagger-card group min-w-0 overflow-hidden rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md shadow-xl transition-all duration-500 ease-out hover:-translate-y-2 hover:border-indigo-500/30 hover:bg-white/[0.07] hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.3)]"
@@ -158,7 +233,17 @@ function ItemCard({ item, index, onEdit, onDelete, deleting }) {
 
         <Warranty terms={item.warrantyTerms} />
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/10 pt-4 text-xs font-semibold text-slate-500">
+          <span>Updated {formatTimestamp(item.updatedAt || item.createdAt)}</span>
+          <span className="rounded-full bg-white/5 px-2.5 py-1 text-[0.68rem] uppercase tracking-wider text-slate-400">
+            {normalizeCurrency(item.currency)}
+          </span>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button className={secondaryButton} type="button" onClick={() => onDuplicate(item)}>
+            Duplicate
+          </button>
           <button className={`${secondaryButton} flex-1`} type="button" onClick={() => onEdit(item._id)}>
             Edit Details
           </button>
@@ -260,9 +345,34 @@ function HomePage({ navigate }) {
     [items]
   );
 
+  const hasActiveFilters = Boolean(
+    query.trim() || category !== 'All categories' || currencyFilter !== 'All currencies' || sort !== 'newest'
+  );
   const lkrValue = items
     .filter((item) => normalizeCurrency(item.currency) === DEFAULT_CURRENCY)
     .reduce((sum, item) => sum + Number(item.price), 0);
+
+  function resetFilters() {
+    setQuery('');
+    setCategory('All categories');
+    setCurrencyFilter('All currencies');
+    setSort('newest');
+  }
+
+  function duplicateItem(item) {
+    const duplicated = {
+      name: `${item.name} Copy`,
+      category: item.category,
+      price: String(item.price),
+      currency: normalizeCurrency(item.currency),
+      description: item.description,
+      imageUrl: item.imageUrl || '',
+      warrantyTerms: item.warrantyTerms || ''
+    };
+
+    window.sessionStorage.setItem(duplicateStorageKey, JSON.stringify(duplicated));
+    navigate('/add-item');
+  }
 
   async function deleteItem(item) {
     const shouldDelete = window.confirm(`Delete "${item.name}"? This cannot be undone.`);
@@ -314,10 +424,22 @@ function HomePage({ navigate }) {
               Inventory
             </h2>
           </div>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-300 sm:text-sm">{visibleItems.length} shown</span>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-300 sm:text-sm">
+              {visibleItems.length} shown
+            </span>
+            <button
+              className={secondaryButton}
+              type="button"
+              disabled={visibleItems.length === 0}
+              onClick={() => exportItemsToCsv(visibleItems)}
+            >
+              Export CSV
+            </button>
+          </div>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 backdrop-blur-md lg:grid-cols-[minmax(240px,1fr)_190px_190px_190px]">
+        <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 backdrop-blur-md lg:grid-cols-[minmax(240px,1fr)_190px_190px_190px_auto]">
           <label className={labelClass}>
             <span className="mb-2 block">Search items</span>
             <input
@@ -355,6 +477,16 @@ function HomePage({ navigate }) {
               <option value="price-high">Price: high to low</option>
             </select>
           </label>
+          <div className="flex items-end">
+            <button
+              className={`${secondaryButton} w-full lg:min-w-[140px]`}
+              type="button"
+              disabled={!hasActiveFilters}
+              onClick={resetFilters}
+            >
+              Reset filters
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -401,6 +533,7 @@ function HomePage({ navigate }) {
                 item={item}
                 index={index}
                 deleting={deletingId === item._id}
+                onDuplicate={duplicateItem}
                 onEdit={(id) => navigate(`/edit-item/${id}`)}
                 onDelete={deleteItem}
               />
@@ -423,6 +556,33 @@ function ItemFormPage({ itemId, navigate }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(editing);
   const [saving, setSaving] = useState(false);
+  const [draftNotice, setDraftNotice] = useState('');
+
+  useEffect(() => {
+    if (editing) return;
+
+    const duplicated = window.sessionStorage.getItem(duplicateStorageKey);
+    if (duplicated) {
+      try {
+        setForm({ ...emptyItem, ...JSON.parse(duplicated) });
+        setDraftNotice('A duplicate copy was loaded. Review the fields, then save it as a new item.');
+      } catch {
+        window.sessionStorage.removeItem(duplicateStorageKey);
+      }
+      window.sessionStorage.removeItem(duplicateStorageKey);
+      return;
+    }
+
+    const draft = window.localStorage.getItem(draftStorageKey);
+    if (draft) {
+      try {
+        setForm({ ...emptyItem, ...JSON.parse(draft) });
+        setDraftNotice('Your last unsaved draft was restored from this browser.');
+      } catch {
+        window.localStorage.removeItem(draftStorageKey);
+      }
+    }
+  }, [editing]);
 
   useEffect(() => {
     if (!editing) return;
@@ -444,6 +604,17 @@ function ItemFormPage({ itemId, navigate }) {
       .catch((requestError) => setError(requestError.message))
       .finally(() => setLoading(false));
   }, [editing, itemId]);
+
+  useEffect(() => {
+    if (editing) return;
+
+    if (isBlankDraft(form)) {
+      window.localStorage.removeItem(draftStorageKey);
+      return;
+    }
+
+    window.localStorage.setItem(draftStorageKey, JSON.stringify(form));
+  }, [editing, form]);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -475,6 +646,7 @@ function ItemFormPage({ itemId, navigate }) {
         await itemApi.update(itemId, payload);
       } else {
         await itemApi.create(payload);
+        window.localStorage.removeItem(draftStorageKey);
       }
       navigate('/');
     } catch (requestError) {
@@ -520,6 +692,24 @@ function ItemFormPage({ itemId, navigate }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px]">
           <form className="p-8 sm:p-12 lg:p-[60px]" onSubmit={submit} noValidate>
+            {!editing && draftNotice && (
+              <div className="animate-soft-in mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-5 py-4 text-sm font-semibold text-indigo-200">
+                <span>{draftNotice}</span>
+                <button
+                  className="text-xs font-bold uppercase tracking-wider text-indigo-300 underline-offset-4 hover:text-white hover:underline"
+                  type="button"
+                  onClick={() => {
+                    setForm(emptyItem);
+                    setDraftNotice('Draft cleared. You are starting from a blank form.');
+                    window.localStorage.removeItem(draftStorageKey);
+                    window.sessionStorage.removeItem(duplicateStorageKey);
+                  }}
+                >
+                  Clear saved draft
+                </button>
+              </div>
+            )}
+
             {error && (
               <div className="animate-soft-in mb-6 rounded-xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm font-bold text-rose-400" role="alert">
                 {error}

@@ -1,6 +1,6 @@
 # MERN Item Manager
 
-A simple but complete inventory management app built with the MERN stack. The app is intentionally small enough for Jenkins CI/CD practice, but it still has real frontend and backend behavior: item creation, editing, deletion, search, filtering, sorting, validation, MongoDB persistence, and automated tests.
+A simple but complete inventory management app built with the MERN stack. The app is intentionally small enough for Jenkins CI/CD practice, but it still has real frontend and backend behavior: item creation, editing, deletion, duplication, draft recovery, search, filtering, sorting, CSV export, validation, MongoDB persistence, and automated tests.
 
 This project does not use Docker. It is designed to run locally with Node.js and MongoDB Atlas.
 
@@ -18,6 +18,14 @@ Item Manager lets you maintain a small inventory collection. Each item can store
 The home page shows inventory statistics, item cards, search, category filters, and sorting controls. The add/edit page provides a form with validation and a live item preview.
 
 **UI Features:** A premium, modern dark mode with glassmorphism (frosted glass panels), neon glowing accents, smooth micro-animations, and dynamic hover effects.
+
+**Workflow Features:**
+
+- Duplicate an existing item into a new draft
+- Auto-restore unsaved add-item drafts from the current browser
+- Export the currently filtered inventory list as CSV
+- Reset all search and filter controls with one click
+- Show a last-updated date on each item card
 
 ## Tech Stack
 
@@ -238,8 +246,20 @@ Currency behavior:
 - The currency filter can isolate records by currency.
 - Price sorting groups items by currency before sorting amounts because the app does not guess live exchange rates.
 - The API validates currency values against supported ISO 4217 codes.
+- CSV export preserves each item's stored currency code.
 
 The app does not perform currency conversion. Adding values from different currencies without exchange-rate data would be misleading.
+
+## Additional Productivity Features
+
+- `Duplicate` creates a new add-item draft from an existing record, which is useful when entering similar inventory items.
+- The add-item form automatically stores a local browser draft while you type.
+- If you leave and come back later, the app restores that unsaved draft automatically.
+- `Clear saved draft` removes the local browser draft and resets the form.
+- `Export CSV` downloads the currently visible inventory rows after search and filter controls are applied.
+- `Reset filters` clears search text, category, currency, and sort preferences in one action.
+- Each item card shows the latest known update date using the record's `updatedAt` or `createdAt` value.
+
 ## API Routes
 
 Base URL:
@@ -350,6 +370,8 @@ Frontend tests cover:
 - Rendering items returned by the API
 - Navigating to the Add Item page
 - LKR formatting and foreign currency display
+- Duplicating an item into a new draft
+- Restoring and clearing a saved local draft
 
 The automated tests do not require MongoDB. Backend tests inject a fake model so the CI feedback loop stays fast and reliable.
 
@@ -457,7 +479,7 @@ or clear site data for `localhost`.
 
 ## Current Status
 
-The app is ready for manual local testing. Jenkins CI/CD can be configured later when you are ready to practice pipeline execution.
+The app is ready for manual local testing. It now includes several quality-of-life features that make the inventory workflow more realistic while still staying small enough for Jenkins CI/CD learning. Jenkins CI/CD can be configured later when you are ready to practice pipeline execution.
 
 ## License
 
