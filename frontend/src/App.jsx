@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { itemApi } from './api';
+import { currencyOptions, DEFAULT_CURRENCY, formatMoney, normalizeCurrency } from './currencies';
 
 const emptyItem = {
   name: '',
   category: '',
   price: '',
+  currency: DEFAULT_CURRENCY,
   description: '',
   imageUrl: '',
   warrantyTerms: ''
@@ -146,7 +148,7 @@ function ItemCard({ item, index, onEdit, onDelete, deleting }) {
             </h3>
           </div>
           <strong className="whitespace-nowrap rounded-lg bg-emerald-500/10 px-3 py-1.5 font-mono text-lg font-bold text-emerald-400">
-            ${Number(item.price).toFixed(2)}
+            {formatMoney(item.price, item.currency)}
           </strong>
         </div>
 
@@ -204,6 +206,7 @@ function HomePage({ navigate }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All categories');
   const [sort, setSort] = useState('newest');
+  const [currencyFilter, setCurrencyFilter] = useState('All currencies');
   const [deletingId, setDeletingId] = useState('');
 
   const loadItems = useCallback(async () => {
@@ -231,23 +234,35 @@ function HomePage({ navigate }) {
     const normalizedQuery = query.trim().toLowerCase();
     const filtered = items.filter((item) => {
       const matchesCategory = category === 'All categories' || item.category === category;
+      const itemCurrency = normalizeCurrency(item.currency);
+      const matchesCurrency = currencyFilter === 'All currencies' || itemCurrency === currencyFilter;
       const matchesQuery =
         !normalizedQuery ||
         [item.name, item.category, item.description].some((value) =>
           value.toLowerCase().includes(normalizedQuery)
         );
-      return matchesCategory && matchesQuery;
+      return matchesCategory && matchesCurrency && matchesQuery;
     });
 
     return filtered.sort((first, second) => {
-      if (sort === 'price-low') return first.price - second.price;
-      if (sort === 'price-high') return second.price - first.price;
+      if (sort === 'price-low' || sort === 'price-high') {
+        const currencyOrder = normalizeCurrency(first.currency).localeCompare(normalizeCurrency(second.currency));
+        if (currencyOrder !== 0) return currencyOrder;
+        return sort === 'price-low' ? first.price - second.price : second.price - first.price;
+      }
       if (sort === 'name') return first.name.localeCompare(second.name);
       return new Date(second.createdAt || 0) - new Date(first.createdAt || 0);
     });
-  }, [category, items, query, sort]);
+  }, [category, currencyFilter, items, query, sort]);
 
-  const totalValue = items.reduce((sum, item) => sum + Number(item.price), 0);
+  const availableCurrencies = useMemo(
+    () => [...new Set(items.map((item) => normalizeCurrency(item.currency)))].sort(),
+    [items]
+  );
+
+  const lkrValue = items
+    .filter((item) => normalizeCurrency(item.currency) === DEFAULT_CURRENCY)
+    .reduce((sum, item) => sum + Number(item.price), 0);
 
   async function deleteItem(item) {
     const shouldDelete = window.confirm(`Delete "${item.name}"? This cannot be undone.`);
@@ -288,7 +303,7 @@ function HomePage({ navigate }) {
       <section className="my-8 grid grid-cols-1 gap-5 sm:mb-14 lg:grid-cols-3" aria-label="Inventory summary">
         <Stat label="Total items" value={items.length} delay="100ms" />
         <Stat label="Categories" value={categories.length} delay="165ms" />
-        <Stat label="Combined value" value={`$${totalValue.toFixed(2)}`} delay="230ms" />
+        <Stat label="LKR inventory value" value={formatMoney(lkrValue)} delay="230ms" />
       </section>
 
       <section className="mb-[72px]" aria-labelledby="inventory-title">
@@ -302,7 +317,7 @@ function HomePage({ navigate }) {
           <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-300 sm:text-sm">{visibleItems.length} shown</span>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 backdrop-blur-md lg:grid-cols-[minmax(240px,1fr)_220px_220px]">
+        <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 backdrop-blur-md lg:grid-cols-[minmax(240px,1fr)_190px_190px_190px]">
           <label className={labelClass}>
             <span className="mb-2 block">Search items</span>
             <input
@@ -319,6 +334,15 @@ function HomePage({ navigate }) {
               <option>All categories</option>
               {categories.map((entry) => (
                 <option key={entry}>{entry}</option>
+              ))}
+            </select>
+          </label>
+          <label className={labelClass}>
+            <span className="mb-2 block">Currency</span>
+            <select className={fieldClass} value={currencyFilter} onChange={(event) => setCurrencyFilter(event.target.value)}>
+              <option>All currencies</option>
+              {availableCurrencies.map((entry) => (
+                <option key={entry} value={entry}>{entry}</option>
               ))}
             </select>
           </label>
@@ -410,6 +434,7 @@ function ItemFormPage({ itemId, navigate }) {
           name: item.name,
           category: item.category,
           price: String(item.price),
+          currency: normalizeCurrency(item.currency),
           description: item.description,
           imageUrl: item.imageUrl || '',
           warrantyTerms: item.warrantyTerms || ''
@@ -431,6 +456,7 @@ function ItemFormPage({ itemId, navigate }) {
     if (!form.name.trim()) errors.name = 'Enter an item name';
     if (!form.category.trim()) errors.category = 'Enter a category';
     if (form.price === '' || Number(form.price) < 0) errors.price = 'Enter a valid price';
+    if (!form.currency) errors.currency = 'Select a currency';
     if (!form.description.trim()) errors.description = 'Enter a description';
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -515,7 +541,7 @@ function ItemFormPage({ itemId, navigate }) {
                 <FieldError>{fieldErrors.name}</FieldError>
               </label>
 
-              <label className={labelClass}>
+              <label className={`${labelClass} sm:col-span-2`}>
                 <span className="mb-2 block">Category</span>
                 <input
                   className={fieldClass}
@@ -530,7 +556,7 @@ function ItemFormPage({ itemId, navigate }) {
               </label>
 
               <label className={labelClass}>
-                <span className="mb-2 block">Price (USD)</span>
+                <span className="mb-2 block">Price</span>
                 <input
                   className={fieldClass}
                   name="price"
@@ -543,6 +569,23 @@ function ItemFormPage({ itemId, navigate }) {
                   aria-invalid={Boolean(fieldErrors.price)}
                 />
                 <FieldError>{fieldErrors.price}</FieldError>
+              </label>
+              <label className={labelClass}>
+                <span className="mb-2 block">Currency</span>
+                <select
+                  className={fieldClass}
+                  name="currency"
+                  value={form.currency}
+                  onChange={updateField}
+                  aria-invalid={Boolean(fieldErrors.currency)}
+                >
+                  {currencyOptions.map(({ code, name }) => (
+                    <option key={code} value={code}>
+                      {code} - {name}
+                    </option>
+                  ))}
+                </select>
+                <FieldError>{fieldErrors.currency}</FieldError>
               </label>
 
               <label className={`${labelClass} sm:col-span-2`}>
@@ -614,7 +657,7 @@ function ItemFormPage({ itemId, navigate }) {
               {form.name || 'Your item name'}
             </h2>
             <strong className="mb-6 block text-xl font-mono font-bold text-emerald-400">
-              {form.price === '' ? '$0.00' : `$${Number(form.price || 0).toFixed(2)}`}
+              {formatMoney(form.price, form.currency)}
             </strong>
             <p className="mb-6 text-sm leading-relaxed text-slate-400 [overflow-wrap:anywhere]">
               {form.description || 'Your item description will appear here.'}

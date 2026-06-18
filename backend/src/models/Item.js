@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { DEFAULT_CURRENCY, supportedCurrencies } from '../currencies.js';
 
 const itemSchema = new mongoose.Schema(
   {
@@ -18,6 +19,13 @@ const itemSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0
+    },
+    currency: {
+      type: String,
+      required: true,
+      uppercase: true,
+      enum: supportedCurrencies,
+      default: DEFAULT_CURRENCY
     },
     description: {
       type: String,

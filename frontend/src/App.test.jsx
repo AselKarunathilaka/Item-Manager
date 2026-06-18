@@ -7,6 +7,7 @@ const item = {
   name: 'Mechanical Keyboard',
   category: 'Electronics',
   price: 89.99,
+  currency: 'LKR',
   description: 'Compact wireless keyboard with tactile switches.',
   imageUrl: '',
   warrantyTerms: '1 year manufacturer warranty',
@@ -33,7 +34,7 @@ describe('App', () => {
 
     expect(screen.getByText('Loading your inventory')).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Mechanical Keyboard')).toBeInTheDocument());
-    expect(screen.getAllByText('$89.99')).toHaveLength(2);
+    expect(screen.getAllByText(/Rs\s*89\.99/)).toHaveLength(2);
     expect(screen.getByText('1 year manufacturer warranty')).toBeInTheDocument();
   });
 
@@ -47,8 +48,9 @@ describe('App', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Add Item' }));
 
-    expect(screen.getByRole('heading', { name: 'Add Item' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Create Item' })).toBeInTheDocument();
     expect(screen.getByLabelText('Item name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Currency')).toHaveValue('LKR');
     expect(window.location.pathname).toBe('/add-item');
   });
 });

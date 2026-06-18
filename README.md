@@ -223,6 +223,23 @@ Then stop the listed process ID if it belongs to this app:
 Stop-Process -Id PROCESS_ID -Force
 ```
 
+
+## Currency Support
+
+Sri Lankan Rupees (`LKR`) are the primary and default currency. The item form also provides all ISO 4217 currencies supported by the browser, so an item can be stored in USD, EUR, GBP, JPY, INR, or another world currency when needed.
+
+Currency behavior:
+
+- New items default to `LKR`.
+- Existing database items without a currency are treated as `LKR`.
+- LKR prices are displayed with the localized `Rs` symbol.
+- Foreign prices retain their ISO code, such as `USD 25.00`, to avoid ambiguous symbols.
+- The dashboard reports the total value of LKR items only.
+- The currency filter can isolate records by currency.
+- Price sorting groups items by currency before sorting amounts because the app does not guess live exchange rates.
+- The API validates currency values against supported ISO 4217 codes.
+
+The app does not perform currency conversion. Adding values from different currencies without exchange-rate data would be misleading.
 ## API Routes
 
 Base URL:
@@ -246,7 +263,8 @@ Example item payload:
 {
   "name": "Batman Hush",
   "category": "DC Comic",
-  "price": 12,
+  "price": 12000,
+  "currency": "LKR",
   "description": "A Batman Hush comic book.",
   "imageUrl": "https://example.com/batman.jpg",
   "warrantyTerms": "No warranty"
@@ -268,6 +286,7 @@ Optional fields:
 Validation rules:
 
 - Price must be a number greater than or equal to `0`
+- Currency must be a supported ISO 4217 code
 - Image URL must be a valid `http` or `https` URL if provided
 - Text fields are trimmed before saving
 - Empty required fields return a `400` response
@@ -324,11 +343,13 @@ Backend tests cover:
 - Deleting missing items
 - Validation for incomplete data
 - Validation for blank price values
+- LKR defaults and ISO currency validation
 
 Frontend tests cover:
 
 - Rendering items returned by the API
 - Navigating to the Add Item page
+- LKR formatting and foreign currency display
 
 The automated tests do not require MongoDB. Backend tests inject a fake model so the CI feedback loop stays fast and reliable.
 
@@ -441,5 +462,3 @@ The app is ready for manual local testing. Jenkins CI/CD can be configured later
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-

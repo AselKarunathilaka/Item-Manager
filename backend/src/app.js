@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import { DEFAULT_CURRENCY, isSupportedCurrency } from './currencies.js';
 import { Item } from './models/Item.js';
 
 const textFields = ['name', 'category', 'description', 'imageUrl', 'warrantyTerms'];
@@ -10,6 +11,11 @@ function normalizeItem(body) {
   for (const field of textFields) {
     item[field] = typeof body[field] === 'string' ? body[field].trim() : '';
   }
+
+  item.currency =
+    typeof body.currency === 'string' && body.currency.trim()
+      ? body.currency.trim().toUpperCase()
+      : DEFAULT_CURRENCY;
 
   item.price =
     body.price === '' || body.price === null || body.price === undefined
@@ -29,6 +35,10 @@ function validateItem(item) {
 
   if (!Number.isFinite(item.price) || item.price < 0) {
     errors.price = 'Price must be a number greater than or equal to 0';
+  }
+
+  if (!isSupportedCurrency(item.currency)) {
+    errors.currency = 'Select a valid ISO 4217 currency';
   }
 
   if (!item.description) errors.description = 'Description is required';

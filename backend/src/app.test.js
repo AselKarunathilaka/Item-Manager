@@ -17,6 +17,7 @@ const validItem = {
   name: 'Mechanical Keyboard',
   category: 'Electronics',
   price: 89.99,
+  currency: 'LKR',
   description: 'Compact wireless keyboard with tactile switches.',
   imageUrl: 'https://example.com/keyboard.jpg',
   warrantyTerms: '1 year manufacturer warranty'
@@ -78,13 +79,38 @@ describe('item API', () => {
     expect(model.create).not.toHaveBeenCalled();
   });
 
+  it('rejects an unsupported currency code', async () => {
+    const model = createItemModel();
+    const response = await request(createApp(model))
+      .post('/api/items')
+      .send({ ...validItem, currency: 'XYZ' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors.currency).toBeTruthy();
+    expect(model.create).not.toHaveBeenCalled();
+  });
+
+  it('defaults legacy requests without a currency to LKR', async () => {
+    const legacyItem = { ...validItem };
+    delete legacyItem.currency;
+    const created = { _id: 'legacy', ...legacyItem, currency: 'LKR' };
+    const model = createItemModel({ create: vi.fn().mockResolvedValue(created) });
+
+    const response = await request(createApp(model))
+      .post('/api/items')
+      .send(legacyItem);
+
+    expect(response.status).toBe(201);
+    expect(model.create).toHaveBeenCalledWith({ ...legacyItem, currency: 'LKR' });
+  });
+
   it('creates a normalized item', async () => {
     const created = { _id: '2', ...validItem };
     const model = createItemModel({ create: vi.fn().mockResolvedValue(created) });
 
     const response = await request(createApp(model))
       .post('/api/items')
-      .send({ ...validItem, name: '  Mechanical Keyboard  ' });
+      .send({ ...validItem, name: '  Mechanical Keyboard  ', currency: 'lkr' });
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual(created);
@@ -95,20 +121,20 @@ describe('item API', () => {
   });
 
   it('updates an existing item', async () => {
-    const updated = { _id: '2', ...validItem, price: 79.99 };
+    const updated = { _id: '2', ...validItem, price: 79.99, currency: 'USD' };
     const model = createItemModel({
       findByIdAndUpdate: vi.fn().mockResolvedValue(updated)
     });
 
     const response = await request(createApp(model))
       .put('/api/items/2')
-      .send({ ...validItem, price: 79.99 });
+      .send({ ...validItem, price: 79.99, currency: 'USD' });
 
     expect(response.status).toBe(200);
-    expect(response.body.price).toBe(79.99);
+    expect(response.body.currency).toBe('USD');
     expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
       '2',
-      { ...validItem, price: 79.99 },
+      { ...validItem, price: 79.99, currency: 'USD' },
       { new: true, runValidators: true }
     );
   });
